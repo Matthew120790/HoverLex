@@ -347,9 +347,9 @@ namespace HoverLex
             Button helpButton = Theme.Button("使用指南",false); ((SoftButton)helpButton).Navigation = true; helpButton.BackColor = Theme.Sidebar; helpButton.ForeColor = Theme.SideMuted; helpButton.Name = "helpButton"; helpButton.Dock = DockStyle.Top; helpButton.Margin = new Padding(0); side.Controls.Add(helpButton,0,4);
             Label footer = Theme.Label("离线词典 · 本机取词\nHoverLex  " + AppVersion.Current,8,Theme.SideMuted); footer.Dock = DockStyle.Fill; footer.TextAlign = ContentAlignment.BottomLeft; side.Controls.Add(footer,0,6);
             sidebar.Controls.Add(side); shell.Controls.Add(sidebar,0,0);
-            TableLayoutPanel root = new TableLayoutPanel { Dock = DockStyle.Fill, Padding = new Padding(30,28,30,16), ColumnCount = 1, RowCount = 6, Margin = new Padding(0) };
+            TableLayoutPanel root = new TableLayoutPanel { Dock = DockStyle.Fill, Padding = new Padding(30,16,30,8), ColumnCount = 1, RowCount = 6, Margin = new Padding(0) };
             root.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100));
-            root.RowStyles.Add(new RowStyle(SizeType.Absolute,76)); root.RowStyles.Add(new RowStyle(SizeType.Absolute,68)); root.RowStyles.Add(new RowStyle(SizeType.Absolute,110)); root.RowStyles.Add(new RowStyle(SizeType.Absolute,134)); root.RowStyles.Add(new RowStyle(SizeType.Percent,100)); root.RowStyles.Add(new RowStyle(SizeType.Absolute,32));
+            root.RowStyles.Add(new RowStyle(SizeType.Absolute,68)); root.RowStyles.Add(new RowStyle(SizeType.Absolute,68)); root.RowStyles.Add(new RowStyle(SizeType.Absolute,110)); root.RowStyles.Add(new RowStyle(SizeType.Absolute,134)); root.RowStyles.Add(new RowStyle(SizeType.Percent,100)); root.RowStyles.Add(new RowStyle(SizeType.Absolute,32));
             FlowLayoutPanel title = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.TopDown, WrapContents = false, Margin = new Padding(0) };
             Label heading = Theme.Label("查词，读懂每一个词。",20,Theme.Ink); heading.Font = Theme.Font(20,FontStyle.Bold); heading.Margin = new Padding(0,0,0,6);
             title.Controls.Add(heading); title.Controls.Add(Theme.Label("随手查词，收藏值得记住的表达。",9,Theme.Muted)); root.Controls.Add(title,0,0);
@@ -404,7 +404,7 @@ namespace HoverLex
             inputTranslation.CheckedChanged+=delegate { UpdateTranslation(); };
             englishCorrection.CheckedChanged+=delegate { UpdateEnglishCorrection(); };
             autoReplace.CheckedChanged+=delegate { if(translation==null || previewMode) return; translation.AutoReplace=autoReplace.Checked; settings.AutoReplaceTranslation=autoReplace.Checked; try { settings.Save(Path.Combine(userDir,"settings.json")); } catch(Exception error) { translationStatus.Text="设置保存失败："+error.Message; } };
-            Card notebook = new Card { Dock = DockStyle.Fill, Padding = new Padding(20,18,20,14), Margin = new Padding(0) };
+            Card notebook = new Card { Dock = DockStyle.Fill, Padding = new Padding(20,12,20,8), Margin = new Padding(0) };
             TableLayoutPanel notebookLayout = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 3 };
             notebookLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100)); notebookLayout.RowStyles.Add(new RowStyle(SizeType.Absolute,42)); notebookLayout.RowStyles.Add(new RowStyle(SizeType.Absolute,78)); notebookLayout.RowStyles.Add(new RowStyle(SizeType.Percent,100));
             TableLayoutPanel toolbar = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 1 };
