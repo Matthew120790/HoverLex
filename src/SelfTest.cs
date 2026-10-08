@@ -212,7 +212,8 @@ namespace HoverLex
                 Check(correction.Right<=correction.Parent.ClientSize.Width && correction.Bottom<=correction.Parent.ClientSize.Height,"the independent correction switch fits the minimum window size");
                 ((CheckBox)correction).Checked=false;
                 using(Bitmap image=new Bitmap(main.Width,main.Height)) { main.DrawToBitmap(image,new Rectangle(Point.Empty,main.Size)); image.Save(Path.Combine(Base,"correction-off-preview.png")); }
-                Check(lookup.Bottom <= lookup.Parent.ClientSize.Height && main.Controls.Find("savedList",true)[0].Height >= 100, "critical controls fit the minimum window size");
+                int savedHeight=main.Controls.Find("savedList",true)[0].Height;
+                Check(lookup.Bottom <= lookup.Parent.ClientSize.Height && savedHeight >= 100, "critical controls fit the minimum window size (lookup="+lookup.Bottom+"/"+lookup.Parent.ClientSize.Height+", vocabulary="+savedHeight+")");
             }
             using (MainForm main = new MainForm(true,new List<SavedWord> {
                 new SavedWord { Word = "curiosity", Meaning = "n. 好奇心；求知欲", SavedAt = "2026-10-04 09:30" },

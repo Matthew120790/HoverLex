@@ -298,7 +298,7 @@ namespace HoverLex
             rowImages.ImageSize = new Size(1,(int)(44*dpi));
             using (Bitmap spacer = new Bitmap(1,(int)(44*dpi))) rowImages.Images.Add(spacer);
             ClientSize = new Size((int)(960 * dpi), (int)(800 * dpi));
-            MinimumSize = new Size((int)(880 * dpi), (int)(760 * dpi));
+            MinimumSize = SizeFromClientSize(new Size((int)(880 * dpi), (int)(760 * dpi)));
             popup.SaveWord = SaveWord; popup.SpeakWord = Speak;
             popup.VisibleChanged+=delegate { if(!popup.Visible) CancelHoverLookup(); };
             searchTranslation=new SearchTranslation(search,message=> { if(!IsDisposed) status.Text=message; },word=>dictionary==null ? null : dictionary.Lookup(word),word=>ShowEntry(word,"手动查词",""));
