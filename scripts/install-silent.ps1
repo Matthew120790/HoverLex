@@ -2,6 +2,7 @@ param(
     [string]$Target = (Join-Path $env:LOCALAPPDATA 'HoverLex'),
     [string]$Desktop = [Environment]::GetFolderPath('DesktopDirectory'),
     [string]$StartMenu = (Join-Path ([Environment]::GetFolderPath('Programs')) 'HoverLex'),
+    [string]$InstallerPath,
     [switch]$AuditOnly,
     [switch]$SkipIconRefresh,
     [switch]$RestartExplorer
@@ -13,6 +14,7 @@ $Desktop = [IO.Path]::GetFullPath($Desktop)
 $StartMenu = [IO.Path]::GetFullPath($StartMenu)
 $version = [IO.File]::ReadAllText((Join-Path $projectRoot 'VERSION')).Trim()
 $installer = Join-Path $projectRoot ('release/HoverLex-Setup-v' + $version + '.exe')
+if ($InstallerPath) { $installer = [IO.Path]::GetFullPath($InstallerPath) }
 $reportRoot = Join-Path $projectRoot ('artifacts/install-audit-' + (Get-Date -Format 'yyyyMMdd-HHmmss') + '-' + [Guid]::NewGuid().ToString('N').Substring(0,8))
 New-Item -ItemType Directory -Path $reportRoot -Force | Out-Null
 function Get-DataSnapshot {

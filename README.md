@@ -6,7 +6,19 @@ HoverLex 是 Windows 10/11 x64 英语阅读与输入助手：Ctrl 悬停查词�
 
 ![HoverLex 主窗口（示例生词）](docs/images/main-window.png)
 
-本仓库提供源码、图标和构建脚本。词库及约 105 MiB 的纠错组件通过脚本准备，不纳入 Git；构建产物、个人生词、设置、API 密钥和发布签名私钥均不上传。构建步骤见[从源码构建](#从源码构建)，当前验证范围见 [VALIDATION.md](VALIDATION.md)。
+## 下载与安装
+
+支持 **Windows 10/11，64 位（x64）**。
+
+- **推荐安装版：** [下载 HoverLex-Setup-v0.12.0.exe](https://github.com/Matthew120790/HoverLex/releases/download/v0.12.0/HoverLex-Setup-v0.12.0.exe)，运行安装器，完成后从桌面的「HoverLex 鼠标取词」打开。
+- **免安装版：** [下载 HoverLex-Windows-x64-v0.12.0.zip](https://github.com/Matthew120790/HoverLex/releases/download/v0.12.0/HoverLex-Windows-x64-v0.12.0.zip)，完整解压后运行 `HoverLex/HoverLex.exe`，保留旁边的组件与词典文件。
+- **后续版本：** [打开最新发布页](https://github.com/Matthew120790/HoverLex/releases/latest)，在 Assets 中下载安装器或免安装 ZIP。
+
+免费模式无需 API 密钥。选择 DeepSeek 时，请在「翻译设置」填写自己的密钥。开启「输入助手」和「英文纠错」后才会自动检查其他输入框中的英文；也可先点击「体验取词」或「翻译练习」试用。
+
+GitHub 的 **Code → Download ZIP** 和发布页的 **Source code** 是开发源码；日常使用请选择上面的安装版或免安装版。
+
+本仓库提供源码、图标和构建脚本；发布页提供可直接运行的程序包。词库及约 105 MiB 的纠错组件通过脚本准备，不纳入 Git；个人生词、设置、API 密钥和发布签名私钥均不上传。构建步骤见[从源码构建](#从源码构建)，当前验证范围见 [VALIDATION.md](VALIDATION.md)。
 
 ## v0.12.0：输入检测恢复与状态提示
 
@@ -90,7 +102,7 @@ DeepSeek 接入依据：[官方对话接口](https://api-docs.deepseek.com/api/c
 
 ## 桌面安装版（推荐）
 
-1. 按下面的源码构建步骤生成 `HoverLex-Setup-v0.12.0.exe`，再运行安装器。安装不需要管理员权限。
+1. 从[最新发布页](https://github.com/Matthew120790/HoverLex/releases/latest)下载 `HoverLex-Setup-v0.12.0.exe`，再运行安装器。安装不需要管理员权限。
 2. 安装器会将软件放到 `%LOCALAPPDATA%\HoverLex`，并在桌面创建 **HoverLex 鼠标取词** 图标。
 3. 以后双击桌面图标打开：先检查最新发布版，有更新时自动下载安装并切换，再打开软件。
 4. 点击“体验取词”，按住 Ctrl 后移动到示例英文单词上停留。
@@ -117,7 +129,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-silent.ps1
 
 ## 自动更新
 
-默认更新来源是构建电脑上的项目发布目录：
+GitHub 发布页的安装版使用 HTTPS 签名清单检查更新。普通源码构建默认使用构建电脑上的项目发布目录：
 
 ```text
 <项目目录>\updates\latest.json
@@ -127,7 +139,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-silent.ps1
 
 新版独立安装到 `versions`，生词和设置固定存放在安装目录下的 `UserData`，切换版本不会重建生词本。旧版本和上一版指针会保留。
 
-源码公开在 [Matthew120790/HoverLex](https://github.com/Matthew120790/HoverLex)，默认自动更新仍使用本机构建目录。更新器支持 HTTPS 签名清单，需另行配置线上清单和程序包地址；公开源码不会自动改变已安装程序的更新来源。请保留本机项目的 `updates` 与 `.release-signing` 目录；后者存放用于发布更新的密钥，不应随源码公开或分发。首次从新克隆构建时会生成自己的发布签名密钥。
+源码公开在 [Matthew120790/HoverLex](https://github.com/Matthew120790/HoverLex)。`scripts/build-public-release.ps1` 生成面向 GitHub Releases 的安装包和免安装包，清除本机迁移路径并使用线上更新来源；上传每次生成的 `latest.json`、程序 ZIP 与安装器后，新安装版可检查后续更新。既有本地安装的更新来源保留。请保留本机 `.release-signing` 目录，后续发布使用同一签名密钥；私钥不应公开或分发。首次从新克隆构建时会生成自己的发布签名密钥。
 
 ## 免安装版
 
@@ -260,6 +272,14 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-desktop.ps1 -T
 ```
 
 软件在 `dist/HoverLex`，安装器与源码 ZIP 在 `release`，自动更新清单与包在 `updates`。使用 Windows 自带的 .NET Framework C# 编译器，不需要额外 .NET SDK，源码保持 C# 5 语法。版本号来自 `VERSION`；同一版本号的较新发布构建也能更新。
+
+准备好资源后，构建可公开发布的程序包：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-public-release.ps1 -Test
+```
+
+输出在新的 `artifacts/public-release-*` 目录，包含安装器、免安装 ZIP、签名更新清单 `latest.json` 和校验文件 `SHA256SUMS.txt`。测试安装目录、桌面和开始菜单均限定在该输出目录内，不刷新系统图标。
 
 目录：
 
