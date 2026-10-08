@@ -53,7 +53,13 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Signed release download failed.' }
       - name: Build and test installer
         if: inputs.stage == 'installer'
-        run: ./scripts/finalize-public-installer.ps1 -OutputDirectory artifacts/cloud-release -PublicKeyPath desktop/release-public.xml -Test
+        run: |
+          try {
+            ./scripts/finalize-public-installer.ps1 -OutputDirectory artifacts/cloud-release -PublicKeyPath desktop/release-public.xml -Test
+          } catch {
+            Get-ChildItem artifacts/install-audit-*/installer.json | ForEach-Object { Get-Content -LiteralPath $_.FullName -Raw }
+            throw
+          }
       - name: Upload installer and checksums
         if: inputs.stage == 'installer'
         run: |
