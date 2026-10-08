@@ -1,0 +1,62 @@
+name: Public Windows release
+on:
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: Build package, then finalize locally signed installer
+        required: true
+        type: choice
+        options:
+          - package
+          - installer
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: windows-2022
+    timeout-minutes: 35
+    env:
+      GH_TOKEN: ${{ github.token }}
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Prepare runtime and dictionary
+        if: inputs.stage == 'package'
+        run: |
+          python scripts/prepare_dictionary.py
+          if ($LASTEXITCODE -ne 0) { throw 'Dictionary preparation failed.' }
+          ./scripts/prepare-proofreader.ps1
+      - name: Build and test portable package
+        if: inputs.stage == 'package'
+        run: |
+          ./scripts/build-public-release.ps1 -PackageOnly -PublicKeyPath desktop/release-public.xml -OutputDirectory artifacts/cloud-release -Test
+          $app = Join-Path $PWD 'artifacts/cloud-release/HoverLex/HoverLex.exe'
+          $process = Start-Process -FilePath $app -ArgumentList '--correction-test' -WindowStyle Hidden -Wait -PassThru
+          Get-Content artifacts/cloud-release/HoverLex/correction-tests.txt
+          if ($process.ExitCode -ne 0) { throw 'Offline proofreading failed.' }
+      - name: Upload package to draft release
+        if: inputs.stage == 'package'
+        run: |
+          $version = (Get-Content VERSION -Raw).Trim()
+          gh release create "v$version" --draft --target $env:GITHUB_SHA --title "HoverLex v$version · Windows 安装版与免安装版" --notes-file .github/release-notes.md
+          if ($LASTEXITCODE -ne 0) { throw 'Draft release creation failed.' }
+          gh release upload "v$version" "artifacts/cloud-release/HoverLex-Windows-x64-v$version.zip" artifacts/cloud-release/release-payload.json
+          if ($LASTEXITCODE -ne 0) { throw 'Package upload failed.' }
+      - name: Download locally signed release
+        if: inputs.stage == 'installer'
+        run: |
+          $version = (Get-Content VERSION -Raw).Trim()
+          New-Item -ItemType Directory artifacts/cloud-release | Out-Null
+          gh release download "v$version" --dir artifacts/cloud-release --pattern "HoverLex-Windows-x64-v$version.zip" --pattern latest.json
+          if ($LASTEXITCODE -ne 0) { throw 'Signed release download failed.' }
+      - name: Build and test installer
+        if: inputs.stage == 'installer'
+        run: ./scripts/finalize-public-installer.ps1 -OutputDirectory artifacts/cloud-release -PublicKeyPath desktop/release-public.xml -Test
+      - name: Upload installer and checksums
+        if: inputs.stage == 'installer'
+        run: |
+          $version = (Get-Content VERSION -Raw).Trim()
+          gh release upload "v$version" "artifacts/cloud-release/HoverLex-Setup-v$version.exe" artifacts/cloud-release/SHA256SUMS.txt
+          if ($LASTEXITCODE -ne 0) { throw 'Installer upload failed.' }

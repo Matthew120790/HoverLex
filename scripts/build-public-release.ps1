@@ -1,7 +1,9 @@
 param(
     [string]$Repository = 'Matthew120790/HoverLex',
     [string]$OutputDirectory,
-    [switch]$Test
+    [switch]$Test,
+    [switch]$PackageOnly,
+    [string]$PublicKeyPath
 )
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
@@ -24,9 +26,15 @@ $readmeText = [IO.File]::ReadAllText($readme).Replace('](docs/images/main-window
 [IO.File]::WriteAllText($readme,$readmeText,(New-Object Text.UTF8Encoding($false)))
 $channel = Join-Path $app 'update-channel.json'
 [IO.File]::WriteAllText($channel,(@{Source=('https://github.com/' + $Repository + '/releases/latest/download/latest.json')} | ConvertTo-Json -Compress),(New-Object Text.UTF8Encoding($false)))
-$bootstrap = Join-Path $output 'bootstrap.json'
-[IO.File]::WriteAllText($bootstrap,'{}')
-& (Join-Path $PSScriptRoot 'sign-release.ps1') -PayloadPath $bootstrap -OutputPath (Join-Path $output 'bootstrap.signed.json')
+if ($PackageOnly -and -not $PublicKeyPath) { throw 'PackageOnly requires a trusted public key.' }
+if (-not $PublicKeyPath) {
+    $bootstrap = Join-Path $output 'bootstrap.json'
+    [IO.File]::WriteAllText($bootstrap,'{}')
+    & (Join-Path $PSScriptRoot 'sign-release.ps1') -PayloadPath $bootstrap -OutputPath (Join-Path $output 'bootstrap.signed.json')
+    $PublicKeyPath = Join-Path $projectRoot '.release-signing/public.xml'
+}
+$PublicKeyPath = (Resolve-Path -LiteralPath $PublicKeyPath).Path
+if ([IO.File]::ReadAllText($PublicKeyPath) -match '<D>') { throw 'Only a public key may be embedded.' }
 $framework = Join-Path $env:WINDIR 'Microsoft.NET/Framework64/v4.0.30319'
 $compiler = Join-Path $framework 'csc.exe'
 $common = @('/nologo','/target:winexe','/platform:x64','/optimize+','/codepage:65001','/utf8output',('/win32manifest:' + (Join-Path $projectRoot 'app.manifest')))
@@ -37,7 +45,7 @@ foreach ($name in @('System.dll','System.Core.dll','System.Drawing.dll','System.
 $common += (Join-Path $projectRoot 'src/Design.cs')
 $common += (Join-Path $projectRoot 'desktop/UpdateCore.cs')
 $common += (Join-Path $projectRoot 'artifacts/build/VersionInfo.cs')
-$common += '/resource:' + (Join-Path $projectRoot '.release-signing/public.xml') + ',update-public-key'
+$common += '/resource:' + $PublicKeyPath + ',update-public-key'
 $launcher = Join-Path $app 'HoverLexLauncher.exe'
 & $compiler (@(('/out:' + $launcher)) + $common + @(('/resource:' + $channel + ',default-channel'),(Join-Path $projectRoot 'desktop/Launcher.cs'),(Join-Path $projectRoot 'desktop/UpdaterTests.cs')))
 if ($LASTEXITCODE -ne 0) { throw 'Public launcher build failed.' }
@@ -49,6 +57,10 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 $payload = Join-Path $output 'release-payload.json'
 $release = @{Version=$version;Revision=[DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds();Package=('https://github.com/' + $Repository + '/releases/download/v' + $version + '/' + $packageName);Size=(Get-Item -LiteralPath $package).Length;Sha256=(Get-FileHash -LiteralPath $package -Algorithm SHA256).Hash.ToLowerInvariant();AppSha256=(Get-FileHash -LiteralPath (Join-Path $app 'HoverLex.exe') -Algorithm SHA256).Hash.ToLowerInvariant()}
 [IO.File]::WriteAllText($payload,($release | ConvertTo-Json -Compress),(New-Object Text.UTF8Encoding($false)))
+if ($PackageOnly) {
+    Write-Host ('Package ready for local signing: ' + $output)
+    return
+}
 $manifest = Join-Path $output 'latest.json'
 & (Join-Path $PSScriptRoot 'sign-release.ps1') -PayloadPath $payload -OutputPath $manifest
 $migration = Join-Path $output 'migration-source.txt'

@@ -2,7 +2,7 @@
 
 HoverLex 是 Windows 10/11 x64 英语阅读与输入助手：Ctrl 悬停查词、选中文字翻译、英文纠错、朗读，以及带复习计划的生词本。
 
-当前版本 **0.12.0**，项目代码使用 **MIT** 许可。第三方词库、LanguageTool 和 Java 组件沿用各自许可，见 [第三方说明](THIRD-PARTY-NOTICES.md)。
+当前版本 **0.12.1**，项目代码使用 **MIT** 许可。第三方词库、LanguageTool 和 Java 组件沿用各自许可，见 [第三方说明](THIRD-PARTY-NOTICES.md)。
 
 ![HoverLex 主窗口（示例生词）](docs/images/main-window.png)
 
@@ -10,8 +10,8 @@ HoverLex 是 Windows 10/11 x64 英语阅读与输入助手：Ctrl 悬停查词�
 
 支持 **Windows 10/11，64 位（x64）**。
 
-- **推荐安装版：** [下载 HoverLex-Setup-v0.12.0.exe](https://github.com/Matthew120790/HoverLex/releases/download/v0.12.0/HoverLex-Setup-v0.12.0.exe)，运行安装器，完成后从桌面的「HoverLex 鼠标取词」打开。
-- **免安装版：** [下载 HoverLex-Windows-x64-v0.12.0.zip](https://github.com/Matthew120790/HoverLex/releases/download/v0.12.0/HoverLex-Windows-x64-v0.12.0.zip)，完整解压后运行 `HoverLex/HoverLex.exe`，保留旁边的组件与词典文件。
+- **推荐安装版：** [下载 HoverLex-Setup-v0.12.1.exe](https://github.com/Matthew120790/HoverLex/releases/download/v0.12.1/HoverLex-Setup-v0.12.1.exe)，运行安装器，完成后从桌面的「HoverLex 鼠标取词」打开。
+- **免安装版：** [下载 HoverLex-Windows-x64-v0.12.1.zip](https://github.com/Matthew120790/HoverLex/releases/download/v0.12.1/HoverLex-Windows-x64-v0.12.1.zip)，完整解压后运行 `HoverLex/HoverLex.exe`，保留旁边的组件与词典文件。
 - **后续版本：** [打开最新发布页](https://github.com/Matthew120790/HoverLex/releases/latest)，在 Assets 中下载安装器或免安装 ZIP。
 
 免费模式无需 API 密钥。选择 DeepSeek 时，请在「翻译设置」填写自己的密钥。开启「输入助手」和「英文纠错」后才会自动检查其他输入框中的英文；也可先点击「体验取词」或「翻译练习」试用。
@@ -102,7 +102,7 @@ DeepSeek 接入依据：[官方对话接口](https://api-docs.deepseek.com/api/c
 
 ## 桌面安装版（推荐）
 
-1. 从[最新发布页](https://github.com/Matthew120790/HoverLex/releases/latest)下载 `HoverLex-Setup-v0.12.0.exe`，再运行安装器。安装不需要管理员权限。
+1. 从[最新发布页](https://github.com/Matthew120790/HoverLex/releases/latest)下载 `HoverLex-Setup-v0.12.1.exe`，再运行安装器。安装不需要管理员权限。
 2. 安装器会将软件放到 `%LOCALAPPDATA%\HoverLex`，并在桌面创建 **HoverLex 鼠标取词** 图标。
 3. 以后双击桌面图标打开：先检查最新发布版，有更新时自动下载安装并切换，再打开软件。
 4. 点击“体验取词”，按住 Ctrl 后移动到示例英文单词上停留。
