@@ -56,6 +56,11 @@ if ($Test) {
     $process = Start-Process -FilePath $installedApp -ArgumentList '--correction-test' -WindowStyle Hidden -Wait -PassThru
     Get-Content -LiteralPath (Join-Path (Split-Path -Parent $installedApp) 'correction-tests.txt')
     if ($process.ExitCode -ne 0) { throw 'Installed proofreading tests failed.' }
+    $data = Join-Path $target 'UserData'
+    [IO.File]::WriteAllText((Join-Path $data 'words.json'),'[{"Word":"release-test","Translation":"test fixture"}]',(New-Object Text.UTF8Encoding($false)))
+    [IO.File]::WriteAllText((Join-Path $data 'settings.json'),'{"CorrectionEnabled":true}',(New-Object Text.UTF8Encoding($false)))
+    & (Join-Path $PSScriptRoot 'install-silent.ps1') -InstallerPath $setup -Target $target -Desktop (Join-Path $output 'test-desktop') -StartMenu (Join-Path $output 'test-start-menu') -SkipIconRefresh | Out-Null
+    Write-Host 'PASS repeat installation preserves synthetic words and settings'
     Write-Host 'PASS public installation, shortcuts, empty user data, HTTPS channel and proofreading'
 }
 Write-Host ('Public installer ready: ' + $setup)

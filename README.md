@@ -281,6 +281,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-public-release
 
 输出在新的 `artifacts/public-release-*` 目录，包含安装器、免安装 ZIP、签名更新清单 `latest.json` 和校验文件 `SHA256SUMS.txt`。测试安装目录、桌面和开始菜单均限定在该输出目录内，不刷新系统图标。
 
+维护者也可运行 GitHub Actions 的 `Public Windows release`：先选择 `package` 构建免安装包，核对发布包的大小与 SHA256 后在本机签署 `release-payload.json`，上传签名的 `latest.json`，再选择 `installer` 生成并测试安装器。流程仅使用 `desktop/release-public.xml` 中的公开验证密钥，发布私钥留在本机。两阶段完成并核验附件后，再公开草稿发布。
+
 目录：
 
 ```text
